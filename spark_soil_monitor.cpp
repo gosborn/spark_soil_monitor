@@ -1,23 +1,32 @@
+#include "SparkFunMAX17043/SparkFunMAX17043.h"
 
-int val = 0;//variable to store soil value
-int soil = A2;//Declare a variable for the soil moisture sensor 
-int soilPower = D6;//Variable for Soil moisture Power
-//Rather than powering the sensor through the V-USB or 3.3V pins, 
-//we'll use a digital pin to power the sensor. This will 
-//prevent oxidation of the sensor as it sits in the corrosive soil. 
+/*  
+    This application monitors the moisture level of your houseplant 
+    and exposes that data to be monitored via the Internet. 
+    Development environment specifics:
+    Particle Build environment (https://www.particle.io/build)
+    Particle Photon RedBoard
+    Released under the MIT License(http://opensource.org/licenses/MIT)
+*/
 
-void setup() 
-{
+int val = 0; //variable to store soil value
+int soil = A2; //Declare a variable for the soil moisture sensor 
+int soilPower = D6; //Variable for Soil moisture Power
 
-pinMode(soilPower, OUTPUT);//Set D6 as an OUTPUT
-digitalWrite(soilPower, LOW);//Set to LOW so no power is flowing through the sensor
+void setup() {
+
+pinMode(soilPower, OUTPUT); //Set D7 as an OUTPUT
+digitalWrite(soilPower, LOW); //Set to LOW so no power is flowing through the sensor
+
+// Set up the MAX17043 LiPo fuel gauge:
+lipo.begin(); // Initialize the MAX17043 LiPo fuel gauge
+lipo.quickStart(); // Quick start restarts the MAX17043 in hopes of getting a more accurate guess for the SOC.
 
 }
 
-void loop() 
-{
-
-Particle.publish("soilLambda", String(readSoil()), 60, PRIVATE);
+void loop() {
+//get soil moisture value from the function below and print it
+Particle.publish("soilLambda", "{\"soil\":" + String(readSoil()) + ", \"battery\":"+ String(getVoltagePercentage()) + "}", 60, PRIVATE);
 
 delay(3600000);//take a reading every hour
 //This time is used so you can test the sensor and see it change in real-time.
@@ -38,11 +47,14 @@ delay(3600000);//take a reading every hour
     }
 }
 //This is a function used to get the soil moisture content
-int readSoil()
-{
+int readSoil() {
     digitalWrite(soilPower, HIGH);//turn D6 "On"
     delay(10);//wait 10 milliseconds 
     val = analogRead(soil);
     digitalWrite(soilPower, LOW);//turn D6 "Off"
     return val;
+}
+
+float getVoltagePercentage() {
+    return lipo.getSOC();
 }
