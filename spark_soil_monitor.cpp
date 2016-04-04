@@ -15,6 +15,8 @@ int soilPower = D6; //Variable for Soil moisture Power
 
 void setup() {
 
+Serial.begin(9600); 
+
 pinMode(soilPower, OUTPUT); //Set D7 as an OUTPUT
 digitalWrite(soilPower, LOW); //Set to LOW so no power is flowing through the sensor
 
@@ -25,10 +27,14 @@ lipo.quickStart(); // Quick start restarts the MAX17043 in hopes of getting a mo
 }
 
 void loop() {
+    
+Serial.print("Battery = ");
+Serial.println(getVoltagePercentage());
+
 //get soil moisture value from the function below and print it
 Particle.publish("soilLambda", "{\"soil\":" + String(readSoil()) + ", \"battery\":"+ String(getVoltagePercentage()) + "}", 60, PRIVATE);
 
-delay(3600000);//take a reading every hour
+delay(60000);//take a reading every hour
 //This time is used so you can test the sensor and see it change in real-time.
 //For in-plant applications, you will want to take readings much less frequently.
 
