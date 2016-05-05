@@ -1,3 +1,6 @@
+// This #include statement was automatically added by the Particle IDE.
+#include "lib1.h"
+
 #include "SparkFunMAX17043/SparkFunMAX17043.h"
 
 /*  
@@ -28,31 +31,41 @@ lipo.quickStart(); // Quick start restarts the MAX17043 in hopes of getting a mo
 
 void loop() {
     
-Serial.print("Battery = ");
-Serial.println(getVoltagePercentage());
-
-//get soil moisture value from the function below and print it
-Particle.publish("soilLambda", "{\"soil\":" + String(readSoil()) + ", \"battery\":"+ String(getVoltagePercentage()) + "}", 60, PRIVATE);
-
-delay(60000);//take a reading every hour
-//This time is used so you can test the sensor and see it change in real-time.
-//For in-plant applications, you will want to take readings much less frequently.
-
-    //If your soil is too dry, turn on Red LED to notify you
-    //This value will vary depending on your soil and plant
-    if(readSoil() < 200)
-    {
-      // take control of the RGB LED
-      RGB.control(true);
-      RGB.color(255, 0, 0);//set RGB LED to Red
+    Spark.disconnect();
+    WiFi.disconnect();
+    WiFi.off(); 
+    doConnect();
+    if (Spark.connected()) {
+        Particle.publish("soilLambda", "{\"soil\":" + String(readSoil()) + ", \"battery\":"+ String(getVoltagePercentage()) + "}", 60, PRIVATE);
+        RGB.control(true);
+        RGB.color(255, 0, 0);
+        delay(5000);
     }
-    else
-    {
-      // resume normal operation
-      RGB.control(false);
-    }
+    RGB.control(true);
+    RGB.color(0,255,0);
+    delay(1000);
+    System.sleep(SLEEP_MODE_DEEP, 300);
 }
-//This is a function used to get the soil moisture content
+
+void doConnect() {
+    WiFi.on();
+    if (!WiFi.ready()) {
+        WiFi.connect();
+        while (WiFi.connecting()) {
+            Spark.process(); //SPARK_WLAN_Loop();
+            delay(1000);
+        }
+    }
+
+    if (!Spark.connected()) {
+        Spark.connect();
+        while (!Spark.connected()) {
+            Spark.process(); //SPARK_WLAN_Loop();
+            delay(1000);
+        }
+    }     
+}
+
 int readSoil() {
     digitalWrite(soilPower, HIGH);//turn D6 "On"
     delay(10);//wait 10 milliseconds 
