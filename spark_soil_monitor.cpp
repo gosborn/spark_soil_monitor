@@ -1,31 +1,20 @@
-// This #include statement was automatically added by the Particle IDE.
 #include "lib1.h"
-
 #include "SparkFunMAX17043/SparkFunMAX17043.h"
 
-/*  
-    This application monitors the moisture level of your houseplant 
-    and exposes that data to be monitored via the Internet. 
-    Development environment specifics:
-    Particle Build environment (https://www.particle.io/build)
-    Particle Photon RedBoard
-    Released under the MIT License(http://opensource.org/licenses/MIT)
-*/
-
-int val = 0; //variable to store soil value
-int soil = A2; //Declare a variable for the soil moisture sensor 
-int soilPower = D6; //Variable for Soil moisture Power
+int val = 0; 
+int soil = A2;  
+int soilPower = D6;
 
 void setup() {
 
 Serial.begin(9600); 
 
-pinMode(soilPower, OUTPUT); //Set D7 as an OUTPUT
-digitalWrite(soilPower, LOW); //Set to LOW so no power is flowing through the sensor
+pinMode(soilPower, OUTPUT);
+digitalWrite(soilPower, LOW);
 
-// Set up the MAX17043 LiPo fuel gauge:
-lipo.begin(); // Initialize the MAX17043 LiPo fuel gauge
-lipo.quickStart(); // Quick start restarts the MAX17043 in hopes of getting a more accurate guess for the SOC.
+// Set up the MAX17043 LiPo fuel gauge
+lipo.begin();
+lipo.quickStart();
 
 }
 
@@ -67,10 +56,10 @@ void doConnect() {
 }
 
 int readSoil() {
-    digitalWrite(soilPower, HIGH);//turn D6 "On"
-    delay(10);//wait 10 milliseconds 
+    digitalWrite(soilPower, HIGH);
+    delay(10);
     val = analogRead(soil);
-    digitalWrite(soilPower, LOW);//turn D6 "Off"
+    digitalWrite(soilPower, LOW);
     return val;
 }
 
