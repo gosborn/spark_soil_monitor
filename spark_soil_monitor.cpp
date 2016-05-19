@@ -33,7 +33,7 @@ void loop() {
     RGB.control(true);
     RGB.color(0,255,0);
     delay(1000);
-    System.sleep(SLEEP_MODE_DEEP, 300);
+    System.sleep(SLEEP_MODE_DEEP, 21600000); //take readings 4 times a day
 }
 
 void doConnect() {
